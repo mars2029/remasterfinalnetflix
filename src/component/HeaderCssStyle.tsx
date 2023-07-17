@@ -232,13 +232,13 @@ export default function Header() {
         <Items>
           <Item>
             {/* Link에서 to는 상대경로로 적으시면 됩니다 ex. '/tv' -> 'tv' */}
-            <Link to={`${process.env.PUBLIC_URL}/`}>
+            <Link to="/">
               Home
               {locHome ? <Circle layoutId="circle" /> : ""}
             </Link>
           </Item>
           <Item>
-            <Link to={`${process.env.PUBLIC_URL}/tv`}>
+            <Link to="tv">
               Tv Shows
               {locTv ? <Circle layoutId="circle" /> : ""}
             </Link>
