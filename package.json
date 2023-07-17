@@ -63,5 +63,5 @@
     "@types/styled-components": "^5.1.26",
     "@types/uuid": "^9.0.1"
   },
-  "homepoage": "https://mars2029.github.io/remasterfinalnetflix"
+  "homepage": "https://mars2029.github.io/remasterfinalnetflix/"
 }

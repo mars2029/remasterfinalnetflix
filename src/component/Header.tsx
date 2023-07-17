@@ -228,7 +228,7 @@ export default function Header() {
     <>
       <Nav variants={navVariants} animate={navAnimation} initial={"top"}>
         <Col>
-          <Link to="/">
+          <Link to={`${process.env.PUBLIC_URL}/`}>
             <Logo
               xmlns="http://www.w3.org/2000/svg"
               width="1024"
@@ -252,13 +252,13 @@ export default function Header() {
           <Items>
             <Item>
               {/* Link에서 to는 상대경로로 적으시면 됩니다 ex. '/tv' -> 'tv' */}
-              <Link to="/">
+              <Link to={`${process.env.PUBLIC_URL}/`}>
                 Home
                 {locHome ? <Circle layoutId="circle" /> : ""}
               </Link>
             </Item>
             <Item>
-              <Link to="tv">
+              <Link to={`${process.env.PUBLIC_URL}/tv`}>
                 Tv Shows
                 {locTv ? <Circle layoutId="circle" /> : ""}
               </Link>
@@ -324,7 +324,7 @@ export default function Header() {
             colorScheme="gray"
             variant={locHome ? "solid" : "outline"}
           >
-            <Link to="/">Home</Link>
+            <Link to={`${process.env.PUBLIC_URL}/`}>Home</Link>
           </Button>
 
           <Button
@@ -332,7 +332,7 @@ export default function Header() {
             colorScheme="gray"
             variant={locTv ? "solid" : "outline"}
           >
-            <Link to="/tv">Tv Show </Link>
+            <Link to={`${process.env.PUBLIC_URL}/tv`}>Tv Show </Link>
           </Button>
 
           <DrawerBody></DrawerBody>

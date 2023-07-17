@@ -10,15 +10,24 @@ function App() {
     <HashRouter>
       <Header />
       <Routes>
-        <Route path="/tv" element={<Tv />}></Route>
-        <Route path="/search" element={<Search />}></Route>
-        <Route path="/" element={<Home />}></Route>
-
-        <Route path="movies/:movieId/:titleId" element={<Home />}></Route>
-        <Route path="tv/:movieId/:titleId" element={<Tv />}></Route>
+        <Route path={process.env.PUBLIC_URL + "/tv"} element={<Tv />}></Route>
+        <Route
+          path={process.env.PUBLIC_URL + "/search"}
+          element={<Search />}
+        ></Route>
+        <Route path={process.env.PUBLIC_URL + "/"} element={<Home />}></Route>
 
         <Route
-          path="search/:movieId/:titleId/:keywordId"
+          path={process.env.PUBLIC_URL + "movies/:movieId/:titleId"}
+          element={<Home />}
+        ></Route>
+        <Route
+          path={process.env.PUBLIC_URL + "tv/:movieId/:titleId"}
+          element={<Tv />}
+        ></Route>
+
+        <Route
+          path={process.env.PUBLIC_URL + "search/:movieId/:titleId/:keywordId"}
           element={<Search />}
         ></Route>
       </Routes>
