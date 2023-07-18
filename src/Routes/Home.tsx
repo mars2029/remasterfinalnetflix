@@ -71,42 +71,6 @@ const SliderBoxItem = styled.div`
   height: 280px;
 `;
 
-const Slider = styled.div``;
-
-const Row = styled(motion.div)`
-  display: grid;
-  gap: 5px;
-  grid-template-columns: repeat(6, 1fr);
-  width: 100%;
-`;
-const Box = styled(motion.div)<{ bgPhoto: string }>`
-  background-color: white;
-  background-image: url(${(props) => props.bgPhoto});
-  background-size: cover;
-  background-position: center center;
-  height: 200px;
-  font-size: 66px;
-  cursor: pointer;
-  &:first-child {
-    transform-origin: center left;
-  }
-  &:last-child {
-    transform-origin: center right;
-  }
-`;
-
-const Info = styled(motion.div)`
-  padding: 10px;
-  background-color: ${(props) => props.theme.black.lighter};
-  opacity: 0;
-  position: absolute;
-  width: 100%;
-  bottom: 0;
-  h4 {
-    text-align: center;
-    font-size: 18px;
-  }
-`;
 const Overlay = styled(motion.div)`
   position: fixed;
   top: 0;
@@ -190,44 +154,80 @@ const BigDetail = styled.p`
   justify-content: space-around;
 `;
 
+// const Slider = styled.div``;
+
+// const Row = styled(motion.div)`
+//   display: grid;
+//   gap: 5px;
+//   grid-template-columns: repeat(6, 1fr);
+//   width: 100%;
+// `;
+// const Box = styled(motion.div)<{ bgPhoto: string }>`
+//   background-color: white;
+//   background-image: url(${(props) => props.bgPhoto});
+//   background-size: cover;
+//   background-position: center center;
+//   height: 200px;
+//   font-size: 66px;
+//   cursor: pointer;
+//   &:first-child {
+//     transform-origin: center left;
+//   }
+//   &:last-child {
+//     transform-origin: center right;
+//   }
+// `;
+
+// const Info = styled(motion.div)`
+//   padding: 10px;
+//   background-color: ${(props) => props.theme.black.lighter};
+//   opacity: 0;
+//   position: absolute;
+//   width: 100%;
+//   bottom: 0;
+//   h4 {
+//     text-align: center;
+//     font-size: 18px;
+//   }
+// `;
 //variables
 
-const rowVariants = {
-  hidden: {
-    x: window.outerWidth + 5,
-  },
-  visible: {
-    x: 0,
-  },
-  exit: {
-    x: -window.outerWidth - 5,
-  },
-};
-const boxVariants = {
-  normal: {
-    scale: 1,
-  },
-  hover: {
-    scale: 1.3,
-    y: -80,
-    transition: {
-      delay: 0.5,
-      duaration: 0.1,
-      type: "tween",
-    },
-  },
-};
-const infoVariants = {
-  hover: {
-    opacity: 1,
-    transition: {
-      delay: 0.5,
-      duaration: 0.1,
-      type: "tween",
-    },
-  },
-};
-const offset = 6;
+// const rowVariants = {
+//   hidden: {
+//     x: window.outerWidth + 5,
+//   },
+//   visible: {
+//     x: 0,
+//   },
+//   exit: {
+//     x: -window.outerWidth - 5,
+//   },
+// };
+// const boxVariants = {
+//   normal: {
+//     scale: 1,
+//   },
+//   hover: {
+//     scale: 1.3,
+//     y: -80,
+//     transition: {
+//       delay: 0.5,
+//       duaration: 0.1,
+//       type: "tween",
+//     },
+//   },
+// };
+// const infoVariants = {
+//   hover: {
+//     opacity: 1,
+//     transition: {
+//       delay: 0.5,
+//       duaration: 0.1,
+//       type: "tween",
+//     },
+//   },
+// };
+// const offset = 6;
 
 // const Boxitem = styled.div<{ bgPhoto: string }>`
 //   background: green;
@@ -244,16 +244,24 @@ const offset = 6;
 // `;
 
 export default function Home() {
+  //기본 설명
+  // 해당 Home은 두가지 방식으로 호출 된다.
+  // 첫번째는 "/" 두번째는 "/movies/:movieId/:titleId" 이다.
+  // 첫번째 경로로 home에 접근하고 3가지의 카테고리 영화리스트를 화면에 리턴한다.
+  // 그리고 세부 아이템을 클릭하면 "/movies/:movieId/:titleId" 와 같은 형식으로 주소가 호출 되는데
+  // 이때 네번째 const { data: dataDetailInfo, isLoading: isDetailInfoLoading } 를 호출하여
+  // 데이터를 가져온다.
+  // 그리고 <AnimatePresence> {bigMovieMatch ? (
+  // 를 통해서 데이터를 화면에 보여준다.
+  // dev tool을 보면 dateDetailInfo 만 적용 될 뿐 다른 useQuery(초기3개)는 작동안하고 이전에
+  // 저장되어 있던 캐시의 데이터를 사용하고 있음을 볼 수 있다.
+  // * useQuery는 실행 후 캐시에 저장 되며 다시 같은 경로를 방문해도 기존의 데이터를 보고 있게 된다.
+
   // 최대 화면을 가운데 정렬하기 위한것.
   const { scrollY } = useScroll(); //스크롤 값을 가져와서
   const setScrollY = useTransform(scrollY, (value) => value + 50); // +50 해서 스크롤 값을 넘겨준다.
-
   const navigate = useNavigate();
-  //const bigMovieMatch = useMatch<{ movieId: string }>("/movies/:movieId");
-
-  const bigMovieMatch: PathMatch<string> | null = useMatch(
-    "/movies/:movieId/:titleId"
-  );
+  const onOverlayClick = () => navigate("/");
 
   const { data: dataNowPlaying, isLoading: isNowPlayingLoading } =
     useQuery<IGetMoviesResult>(["movies", "nowPlaying"], getMovies, {
@@ -270,9 +278,32 @@ export default function Home() {
       refetchOnWindowFocus: false,
     });
 
-  const [index, setIndex] = useState(0);
-  const [leaving, setLeaving] = useState(false);
-  const toggleLeaving = () => setLeaving((prev) => !prev);
+  const bigMovieMatch: PathMatch<string> | null = useMatch(
+    "/movies/:movieId/:titleId"
+  );
+
+  const { data: dataDetailInfo, isLoading: isDetailInfoLoading } =
+    useQuery<IMovie>(
+      // useMatch에서 현재의 주소가 "/movies/:movieId/:titleId" 이 주소가 아니면
+      // null이 입력된다. 즉 해당 값에는 null 값이 들어갈 것이다. 그리고 해당 데이터에는 서버에서 제공하는 에러 메시지가 저장될것이다 왜냐면 값이 null로 해서 조회 될것이기 때문이다.
+      // ["DetailInfo",null]
+      // ["movies","upcoming"]
+      // ["movies","TopRated"]
+      // ["movies","nowPlaying"]
+      ["DetailInfo", bigMovieMatch?.params.movieId],
+      () =>
+        // getMoreDetail에 두개의 인자를 넘긴다. /movie/1234 와 같이 처리하기 위해서이다.
+        getMoreDetail(
+          "movie",
+          bigMovieMatch?.params.movieId ? bigMovieMatch?.params.movieId : ""
+        ),
+      {
+        refetchOnWindowFocus: false,
+      }
+    );
+  // const [index, setIndex] = useState(0);
+  // const [leaving, setLeaving] = useState(false);
+  // const toggleLeaving = () => setLeaving((prev) => !prev);
   // const incraseIndex = () => {
   //   if (dataNowPlaying) {
   //     if (leaving) return;
@@ -283,12 +314,10 @@ export default function Home() {
   //   }
   // };
 
-  const onBoxClicked = (movieId: number) => {
-    //history.push(`/movies/${movieId}`);
-    navigate(`/movies/${movieId}`);
-  };
-
-  const onOverlayClick = () => navigate("/");
+  // const onBoxClicked = (movieId: number) => {
+  //   //history.push(`/movies/${movieId}`);
+  //   navigate(`/movies/${movieId}`);
+  // };
 
   // const clickedMovie =
   //   bigMovieMatch?.params.movieId &&
@@ -302,18 +331,6 @@ export default function Home() {
   //       (movie) => movie.id === +bigMovieMatch.params.movieId!
   //     ));
 
-  const { data: dataDetailInfo, isLoading: isDetailInfoLoading } =
-    useQuery<IMovie>(
-      ["DetailInfo", bigMovieMatch?.params.movieId],
-      () =>
-        getMoreDetail(
-          "movie",
-          bigMovieMatch?.params.movieId ? bigMovieMatch?.params.movieId : ""
-        ),
-      {
-        refetchOnWindowFocus: false,
-      }
-    );
   // const clickedMovie = () => {
   //   if (bigMovieMatch?.params.movieId) {
   //     return dataNowPlaying?.results.find(
@@ -427,8 +444,6 @@ export default function Home() {
                                   )
                                 : `${process.env.PUBLIC_URL}/img/nlogo2.jpg`
                             }
-
-                            
                             )`,
                         }}
                       />

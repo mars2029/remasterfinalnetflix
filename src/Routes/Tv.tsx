@@ -72,42 +72,6 @@ const SliderBoxItem = styled.div`
   height: 280px;
 `;
 
-const Slider = styled.div``;
-
-const Row = styled(motion.div)`
-  display: grid;
-  gap: 5px;
-  grid-template-columns: repeat(6, 1fr);
-  width: 100%;
-`;
-const Box = styled(motion.div)<{ bgPhoto: string }>`
-  background-color: white;
-  background-image: url(${(props) => props.bgPhoto});
-  background-size: cover;
-  background-position: center center;
-  height: 200px;
-  font-size: 66px;
-  cursor: pointer;
-  &:first-child {
-    transform-origin: center left;
-  }
-  &:last-child {
-    transform-origin: center right;
-  }
-`;
-
-const Info = styled(motion.div)`
-  padding: 10px;
-  background-color: ${(props) => props.theme.black.lighter};
-  opacity: 0;
-  position: absolute;
-  width: 100%;
-  bottom: 0;
-  h4 {
-    text-align: center;
-    font-size: 18px;
-  }
-`;
 const Overlay = styled(motion.div)`
   position: fixed;
   top: 0;
@@ -191,70 +155,12 @@ const BigDetail = styled.p`
   justify-content: space-around;
 `;
 
-//variables
-
-const rowVariants = {
-  hidden: {
-    x: window.outerWidth + 5,
-  },
-  visible: {
-    x: 0,
-  },
-  exit: {
-    x: -window.outerWidth - 5,
-  },
-};
-const boxVariants = {
-  normal: {
-    scale: 1,
-  },
-  hover: {
-    scale: 1.3,
-    y: -80,
-    transition: {
-      delay: 0.5,
-      duaration: 0.1,
-      type: "tween",
-    },
-  },
-};
-const infoVariants = {
-  hover: {
-    opacity: 1,
-    transition: {
-      delay: 0.5,
-      duaration: 0.1,
-      type: "tween",
-    },
-  },
-};
-const offset = 6;
-
-// const Boxitem = styled.div<{ bgPhoto: string }>`
-//   background: green;
-//   flex: 0 0 19.7%;
-//   text-align: center;
-//   margin: 0 2px;
-//   transition: transform 300ms ease 100ms;
-//   background-position: center;
-//   background-image: url(${(props) => props.bgPhoto});
-//   background-size: cover;
-//   &:hover {
-//     transform: scale(1.08);
-//   }
-// `;
-
 export default function TV() {
   // 최대 화면을 가운데 정렬하기 위한것.
   const { scrollY } = useScroll(); //스크롤 값을 가져와서
   const setScrollY = useTransform(scrollY, (value) => value + 50); // +50 해서 스크롤 값을 넘겨준다.
-
   const navigate = useNavigate();
-  //const bigMovieMatch = useMatch<{ movieId: string }>("/movies/:movieId");
-
-  const bigMovieMatch: PathMatch<string> | null = useMatch(
-    "/tv/:movieId/:titleId"
-  );
+  const onOverlayClick = () => navigate("/tv");
 
   const { data: dataLatestShows, isLoading: isLatestShowsLoading } =
     useQuery<IGetMoviesResult>(["tv", "LatestShows"], getLatestShows, {
@@ -276,37 +182,9 @@ export default function TV() {
       refetchOnWindowFocus: false,
     });
 
-  const [index, setIndex] = useState(0);
-  const [leaving, setLeaving] = useState(false);
-  const toggleLeaving = () => setLeaving((prev) => !prev);
-  // const incraseIndex = () => {
-  //   if (dataLatestShows) {
-  //     if (leaving) return;
-  //     toggleLeaving();
-  //     const totalMovies = dataLatestShows.results.length - 1;
-  //     const maxIndex = Math.floor(totalMovies / offset) - 1;
-  //     setIndex((prev) => (prev === maxIndex ? 0 : prev + 1));
-  //   }
-  // };
-
-  const onBoxClicked = (movieId: number) => {
-    //history.push(`/movies/${movieId}`);
-    navigate(`/tv/${movieId}`);
-  };
-
-  const onOverlayClick = () => navigate("/tv");
-
-  // const clickedMovie =
-  //   bigMovieMatch?.params.movieId &&
-  //   (dataLatestShows?.results.find(
-  //     (movie) => movie.id === +bigMovieMatch.params.movieId!
-  //   ) ||
-  //     dataAiringToday?.results.find(
-  //       (movie) => movie.id === +bigMovieMatch.params.movieId!
-  //     ) ||
-  //     dataPopular?.results.find(
-  //       (movie) => movie.id === +bigMovieMatch.params.movieId!
-  //     ));
+  const bigMovieMatch: PathMatch<string> | null = useMatch(
+    "/tv/:movieId/:titleId"
+  );
 
   const { data: dataDetailInfo, isLoading: isDetailInfoLoading } =
     useQuery<IMovie>(
@@ -320,17 +198,6 @@ export default function TV() {
         refetchOnWindowFocus: false,
       }
     );
-
-  // const clickedMovie = () => {
-  //   if (bigMovieMatch?.params.movieId) {
-  //     return dataLatestShows?.results.find(
-  //       (movie) => movie.id === +bigMovieMatch.params.movieId!
-  //     );
-  //   } else {
-  //     return "";
-  //   }
-  // };
-  console.log(bigMovieMatch);
 
   return (
     <Wrapper>
@@ -376,39 +243,6 @@ export default function TV() {
                 category={"tv"}
               ></SliderComponent>
             </SliderBoxItem>
-            {/* <Slider>
-              <AnimatePresence initial={false} onExitComplete={toggleLeaving}>
-                <div>Popular Movies</div>
-                <Row
-                  variants={rowVariants}
-                  initial="hidden"
-                  animate="visible"
-                  exit="exit"
-                  transition={{ type: "tween", duration: 1 }}
-                  key={index}
-                >
-                  {dataPopular?.results
-                    .slice(1)
-                    .slice(offset * index, offset * index + offset)
-                    .map((movie) => (
-                      <Box
-                        layoutId={movie.id + ""}
-                        key={movie.id}
-                        whileHover="hover"
-                        initial="normal"
-                        variants={boxVariants}
-                        onClick={() => onBoxClicked(movie.id)}
-                        transition={{ type: "tween" }}
-                        bgPhoto={makeImagePath(movie.backdrop_path, "w500")}
-                      >
-                        <Info variants={infoVariants}>
-                          <h4>{movie.title}</h4>
-                        </Info>
-                      </Box>
-                    ))}
-                </Row>
-              </AnimatePresence>
-            </Slider> */}
           </SliderBox>
 
           <AnimatePresence>

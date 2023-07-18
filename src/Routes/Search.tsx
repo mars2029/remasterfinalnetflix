@@ -85,42 +85,6 @@ const SliderBoxItem = styled.div`
   height: 280px;
 `;
 
-const Slider = styled.div``;
-
-const Row = styled(motion.div)`
-  display: grid;
-  gap: 5px;
-  grid-template-columns: repeat(6, 1fr);
-  width: 100%;
-`;
-const Box = styled(motion.div)<{ bgPhoto: string }>`
-  background-color: white;
-  background-image: url(${(props) => props.bgPhoto});
-  background-size: cover;
-  background-position: center center;
-  height: 200px;
-  font-size: 66px;
-  cursor: pointer;
-  &:first-child {
-    transform-origin: center left;
-  }
-  &:last-child {
-    transform-origin: center right;
-  }
-`;
-
-const Info = styled(motion.div)`
-  padding: 10px;
-  background-color: ${(props) => props.theme.black.lighter};
-  opacity: 0;
-  position: absolute;
-  width: 100%;
-  bottom: 0;
-  h4 {
-    text-align: center;
-    font-size: 18px;
-  }
-`;
 const Overlay = styled(motion.div)`
   position: fixed;
   top: 0;
@@ -203,74 +167,40 @@ const BigDetail = styled.p`
   justify-content: space-around;
 `;
 
-//variables
-
-const rowVariants = {
-  hidden: {
-    x: window.outerWidth + 5,
-  },
-  visible: {
-    x: 0,
-  },
-  exit: {
-    x: -window.outerWidth - 5,
-  },
-};
-const boxVariants = {
-  normal: {
-    scale: 1,
-  },
-  hover: {
-    scale: 1.3,
-    y: -80,
-    transition: {
-      delay: 0.5,
-      duaration: 0.1,
-      type: "tween",
-    },
-  },
-};
-const infoVariants = {
-  hover: {
-    opacity: 1,
-    transition: {
-      delay: 0.5,
-      duaration: 0.1,
-      type: "tween",
-    },
-  },
-};
-const offset = 6;
-
-// const Boxitem = styled.div<{ bgPhoto: string }>`
-//   background: green;
-//   flex: 0 0 19.7%;
-//   text-align: center;
-//   margin: 0 2px;
-//   transition: transform 300ms ease 100ms;
-//   background-position: center;
-//   background-image: url(${(props) => props.bgPhoto});
-//   background-size: cover;
-//   &:hover {
-//     transform: scale(1.08);
-//   }
-// `;
-
 export default function Search() {
-  // 최대 화면을 가운데 정렬하기 위한것.
+  // 이부분은 home과 마찬가지로  2개의 useQuery를 이용해 movie와 tv 리스트를 가져온다.
+  // 그리고 물론 접속 방법이 /search?keyword=test 이기 때문에
+  // Detailinfo는 null이 된다.
+  // 하지만 고려해야 할 점이 이전과 다르게 검색은  /search?keyword=test 의 keyword가 붙는다는것이다.
+
+  // 다시 정리하면 /search?keyword=test 로 접근하면
+  // 두개의 movie와 tv 리스트를 가져오게 되며 이들은 매번 키워드를 가져와 useEffect에서
+  // 페이지를 강제로 갱신시켜 리스트를 동기화 하게 된다.
+  // 이렇게 하지 않으면 캐시 데이터가 있기에 자동으로 동기화 하지 않으며 이러면 새로운 검색에서 멈추게 된다.
+  // 다른 커뮤니티에서는 key값 (["searchMovie", "movie"], )을 입력시켜 갱신 시키라고 하지만
+  // key값을 keyword로 적용시 디테일 아이템을 클릭해서 주소를 "/search/:movieId/:titleId/:keywordId"
+  // 와 같이 이동하면 기존의 캐시값이 없어지는 문제가 발생하게 된다.
+
+  // "/search/:movieId/:titleId/:keywordId" 로 페이지 이동시
+  // 기존의 useQuery도 업데이트 되는것 아니냐고 생각 될 수 있겠지만
+  // 결론적으로는 아니다. 왜냐하면 기본적으로
+  // "/search/200874/Tv/title?keyword=modern"나
+  // "/search?keyword=modern"에서
+  // 공통적인 검색어인 keyword라는 값을 같은 값을 넘기기 때문이다.
+  // useEffect는 keyword를 지켜보는데 키워드가 같으면 업데이트를 하지 않는다.
+  // 그렇기에 "/search/:movieId/:titleId/:keywordId" 로 접근해도 기존의 2가지useQuery는 갱신하지 않고
+  // detail info 만 가져와 화면에 뿌려주게 되는 것이다.
+
+  // <Route path="/search" element={<Search />}></Route>
+  // <Route path="search/:movieId/:titleId/:keywordId" element={<Search />}
+
   const { scrollY } = useScroll(); //스크롤 값을 가져와서
   const setScrollY = useTransform(scrollY, (value) => value + 50); // +50 해서 스크롤 값을 넘겨준다.
-
   const navigate = useNavigate();
-  //const bigMovieMatch = useMatch<{ movieId: string }>("/movies/:movieId");
-
-  const bigMovieMatch: PathMatch<string> | null = useMatch(
-    "/search/:movieId/:titleId/:keywordId"
-  );
+  const onOverlayClick = () => navigate(-1);
 
   const location = useLocation(); // 현재 URL값을 가져온다.
-  const keyword = new URLSearchParams(location.search).get("keyword");
-  // 키워드의 값을 가져온다.
+  const keyword = new URLSearchParams(location.search).get("keyword"); // 키워드의 값을 가져온다.
 
   const {
     data: dataSearchResult,
@@ -284,47 +214,27 @@ export default function Search() {
     }
   );
 
-  const { data: dataSearchTvResult, isLoading: isSearchTvResultLoading } =
-    useQuery<IGetMoviesResult>(
-      ["searchTv", "tv"],
-      () => getSearchTv(keyword ? keyword : ""),
-      {
-        refetchOnWindowFocus: false,
-      }
-    );
+  const {
+    data: dataSearchTvResult,
+    isLoading: isSearchTvResultLoading,
+    refetch: tvRefetch,
+  } = useQuery<IGetMoviesResult>(
+    ["searchTv", "tv"],
+    () => getSearchTv(keyword ? keyword : ""),
+    {
+      refetchOnWindowFocus: false,
+    }
+  );
 
+  //
   useEffect(() => {
     refetch(); // wrap with debounce function to not call on every change
+    tvRefetch();
   }, [keyword]);
 
-  const [index, setIndex] = useState(0);
-  const [leaving, setLeaving] = useState(false);
-  const toggleLeaving = () => setLeaving((prev) => !prev);
-  // const incraseIndex = () => {
-  //   if (dataSearchResult) {
-  //     if (leaving) return;
-  //     toggleLeaving();
-  //     const totalMovies = dataSearchResult.results.length - 1;
-  //     const maxIndex = Math.floor(totalMovies / offset) - 1;
-  //     setIndex((prev) => (prev === maxIndex ? 0 : prev + 1));
-  //   }
-  // };
-
-  const onBoxClicked = (movieId: number) => {
-    //history.push(`/movies/${movieId}`);
-    navigate(`/movies/${movieId}`);
-  };
-
-  const onOverlayClick = () => navigate(-1);
-
-  const clickedMovie =
-    bigMovieMatch?.params.movieId &&
-    (dataSearchResult?.results.find(
-      (movie) => movie.id === +bigMovieMatch.params.movieId!
-    ) ||
-      dataSearchTvResult?.results.find(
-        (movie) => movie.id === +bigMovieMatch.params.movieId!
-      ));
+  const bigMovieMatch: PathMatch<string> | null = useMatch(
+    "/search/:movieId/:titleId/:keywordId"
+  );
 
   const { data: dataDetailInfo, isLoading: isDetailInfoLoading } =
     useQuery<IMovie>(
@@ -343,7 +253,6 @@ export default function Search() {
 
   // console.log(bigMovieMatch?.params.movieId);
   // console.log(dataDetailInfo?.backdrop_path);
-
   // console.log(bigMovieMatch?.params.movieId);
   // console.log(clickedMovie);
   // console.log(dataSearchResult);
