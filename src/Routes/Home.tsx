@@ -361,21 +361,21 @@ export default function Home() {
             <SliderBoxItem>
               <SliderComponent
                 title={"Latest movies"}
-                data={dataNowPlaying}
+                data={dataNowPlaying as IGetMoviesResult}
                 category={"movies"}
               ></SliderComponent>
             </SliderBoxItem>
             <SliderBoxItem>
               <SliderComponent
                 title={"Top Rated Movies"}
-                data={dataTopRated}
+                data={dataTopRated as IGetMoviesResult}
                 category={"movies"}
               ></SliderComponent>
             </SliderBoxItem>
             <SliderBoxItem>
               <SliderComponent
                 title={"Upcoming Movies"}
-                data={dataUpcoming}
+                data={dataUpcoming as IGetMoviesResult}
                 category={"movies"}
               ></SliderComponent>
             </SliderBoxItem>

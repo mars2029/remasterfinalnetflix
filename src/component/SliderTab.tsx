@@ -11,6 +11,7 @@ import {
 } from "react-router-dom";
 import { Button, Icon } from "@chakra-ui/react";
 import { FaAngleLeft, FaAngleRight } from "react-icons/fa";
+import { IGetMoviesResult } from "../api";
 
 const Row = styled(motion.div)`
   display: grid;
@@ -70,7 +71,9 @@ const ArrowLeft = styled.div`
   left: -80px;
   cursor: pointer;
   &:hover {
-    font-size: 20px !important;
+    cursor: pointer;
+    scale: 1.1;
+    background-color: rgba(0, 0, 0, 0.7);
   }
 `;
 
@@ -87,34 +90,41 @@ const ArrowRight = styled.div`
   right: -80px;
   cursor: pointer;
   &:hover {
-    font-size: 20px;
+    cursor: pointer;
+    scale: 1.1;
+    background-color: rgba(0, 0, 0, 0.7);
   }
 `;
 //variables
 
-const rowVariants = {
-  hidden: {
-    x: -window.outerWidth - 5,
+const rowVar = {
+  hidden: (direction: number) => {
+    return {
+      x: direction === 1 ? window.innerWidth + 5 : -window.innerWidth - 5,
+    };
   },
   visible: {
     x: 0,
+    y: 0,
   },
-  exit: {
-    x: window.outerWidth + 5,
+  exit: (direction: number) => {
+    return {
+      x: direction === 1 ? -window.innerWidth - 5 : window.innerWidth + 5,
+    };
   },
 };
 
-const rowVariantsRight = {
-  hidden: {
-    x: window.outerWidth + 5,
-  },
-  visible: {
-    x: 0,
-  },
-  exit: {
-    x: -window.outerWidth - 5,
-  },
-};
+// const rowVariantsRight = {
+//   hidden: {
+//     x: window.outerWidth + 5,
+//   },
+//   visible: {
+//     x: 0,
+//   },
+//   exit: {
+//     x: -window.outerWidth - 5,
+//   },
+// };
 
 const boxVariants = {
   normal: {
@@ -142,40 +152,37 @@ const infoVariants = {
 };
 const offset = 6;
 
-export default function SliderComponent({ title, data, category }: any) {
+interface ISlider {
+  title: string;
+  data: IGetMoviesResult;
+  category: string;
+}
+
+export default function SliderComponent({ title, data, category }: ISlider) {
+  // 수정해 볼것.
+
   const navigate = useNavigate();
 
   const location = useLocation(); // 현재 URL값을 가져온다.
   const keyword = new URLSearchParams(location.search).get("keyword");
 
-  const toggleLeaving = () => setLeaving((prev) => !prev);
+  const toggleLeaving = () => setLeaving((prev) => !prev); //onExitComplete 에 넣어서 exit의 애니메이션이 끝나고 나서 함수가 실행되게함
 
-  const [index, setIndex] = useState(0);
-  const [leaving, setLeaving] = useState(false);
-  const [arrowDirection, setArrowDirection] = useState(false);
+  const [index, setIndex] = useState(0); //슬라이더 인덱스
+  const [leaving, setLeaving] = useState(false); //슬라이더 상태
+  const [arrowDirection, setArrowDirection] = useState(1);
 
-  console.log(index);
-  const incraseIndex = () => {
+  const incraseIndex = (direction: number) => {
     if (data) {
       if (leaving) return;
+      // leaving이 true이면 리턴(아무것도 하지않음) 클릭을 여러번 연속으로 하면
+      // 간격이 벌어지는 버그 수정하기 위해 인덱스 증가 안되게함
       toggleLeaving();
 
-      setArrowDirection((prev) => true);
+      setArrowDirection(direction);
       const totalMovies = data.results.length - 1;
       const maxIndex = Math.floor(totalMovies / offset) - 1;
       setIndex((prev) => (prev === maxIndex ? 0 : prev + 1));
-    }
-  };
-
-  const decraseIndex = () => {
-    if (data) {
-      if (leaving) return;
-      toggleLeaving();
-
-      setArrowDirection((prev) => false);
-      const totalMovies = data.results.length - 1;
-      const maxIndex = Math.floor(totalMovies / offset) - 1;
-      setIndex((prev) => (prev <= 0 ? maxIndex : prev - 1));
     }
   };
 
@@ -196,15 +203,20 @@ export default function SliderComponent({ title, data, category }: any) {
     <>
       <BoxTitle>{title}</BoxTitle>
       <div>
-        <ArrowLeft onClick={incraseIndex}>
+        <ArrowLeft onClick={() => incraseIndex(-1)}>
           <Icon as={FaAngleLeft} boxSize={6} />
         </ArrowLeft>
-        <ArrowRight onClick={decraseIndex}>
+        <ArrowRight onClick={() => incraseIndex(1)}>
           <Icon as={FaAngleRight} boxSize={6} />
         </ArrowRight>
-        <AnimatePresence initial={false} onExitComplete={toggleLeaving}>
+        <AnimatePresence
+          custom={arrowDirection}
+          initial={false}
+          onExitComplete={toggleLeaving}
+        >
           <Row
-            variants={rowVariantsRight}
+            custom={arrowDirection}
+            variants={rowVar}
             initial="hidden"
             animate="visible"
             exit="exit"
@@ -214,7 +226,7 @@ export default function SliderComponent({ title, data, category }: any) {
             {data?.results
 
               .slice(offset * index, offset * index + offset)
-              .map((movie: any) => (
+              .map((movie) => (
                 <Box
                   layoutId={movie.id + title}
                   key={movie.id}

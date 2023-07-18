@@ -280,14 +280,14 @@ export default function Search() {
             <SliderBoxItem>
               <SliderComponent
                 title={"Movie"}
-                data={dataSearchResult}
+                data={dataSearchResult as IGetMoviesResult}
                 category={"search"}
               ></SliderComponent>
             </SliderBoxItem>
             <SliderBoxItem>
               <SliderComponent
                 title={"Tv"}
-                data={dataSearchTvResult}
+                data={dataSearchTvResult as IGetMoviesResult}
                 category={"search"}
               ></SliderComponent>
             </SliderBoxItem>

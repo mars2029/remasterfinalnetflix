@@ -218,28 +218,28 @@ export default function TV() {
             <SliderBoxItem>
               <SliderComponent
                 title={"Latest movies"}
-                data={dataLatestShows}
+                data={dataLatestShows as IGetMoviesResult}
                 category={"tv"}
               ></SliderComponent>
             </SliderBoxItem>
             <SliderBoxItem>
               <SliderComponent
                 title={"AiringToday"}
-                data={dataAiringToday}
+                data={dataAiringToday as IGetMoviesResult}
                 category={"tv"}
               ></SliderComponent>
             </SliderBoxItem>
             <SliderBoxItem>
               <SliderComponent
                 title={"Popular"}
-                data={dataPopular}
+                data={dataPopular as IGetMoviesResult}
                 category={"tv"}
               ></SliderComponent>
             </SliderBoxItem>
             <SliderBoxItem>
               <SliderComponent
                 title={"TopRated"}
-                data={dataTopRated}
+                data={dataTopRated as IGetMoviesResult}
                 category={"tv"}
               ></SliderComponent>
             </SliderBoxItem>
