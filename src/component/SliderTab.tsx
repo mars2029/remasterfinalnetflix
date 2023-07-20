@@ -98,18 +98,20 @@ const ArrowRight = styled.div`
 //variables
 
 const rowVar = {
-  hidden: (direction: number) => {
+  hidden: (direction: boolean) => {
+    console.log(`hidden: ${direction}`);
     return {
-      x: direction === 1 ? window.innerWidth + 5 : -window.innerWidth - 5,
+      x: direction === true ? window.innerWidth + 5 : -window.innerWidth - 5,
     };
   },
   visible: {
     x: 0,
     y: 0,
   },
-  exit: (direction: number) => {
+  exit: (direction: boolean) => {
+    console.log(`exit: ${direction}`);
     return {
-      x: direction === 1 ? -window.innerWidth - 5 : window.innerWidth + 5,
+      x: direction === true ? -window.innerWidth - 5 : window.innerWidth + 5,
     };
   },
 };
@@ -170,9 +172,9 @@ export default function SliderComponent({ title, data, category }: ISlider) {
 
   const [index, setIndex] = useState(0); //슬라이더 인덱스
   const [leaving, setLeaving] = useState(false); //슬라이더 상태
-  const [arrowDirection, setArrowDirection] = useState(1);
+  const [arrowDirection, setArrowDirection] = useState(false);
 
-  const incraseIndex = (direction: number) => {
+  const incraseIndex = (direction: boolean) => {
     if (data) {
       if (leaving) return;
       // leaving이 true이면 리턴(아무것도 하지않음) 클릭을 여러번 연속으로 하면
@@ -203,10 +205,10 @@ export default function SliderComponent({ title, data, category }: ISlider) {
     <>
       <BoxTitle>{title}</BoxTitle>
       <div>
-        <ArrowLeft onClick={() => incraseIndex(-1)}>
+        <ArrowLeft onClick={() => incraseIndex(true)}>
           <Icon as={FaAngleLeft} boxSize={6} />
         </ArrowLeft>
-        <ArrowRight onClick={() => incraseIndex(1)}>
+        <ArrowRight onClick={() => incraseIndex(false)}>
           <Icon as={FaAngleRight} boxSize={6} />
         </ArrowRight>
         <AnimatePresence
